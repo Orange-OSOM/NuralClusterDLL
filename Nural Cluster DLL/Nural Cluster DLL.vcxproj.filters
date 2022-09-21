@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CudaCompile Include="parse.cu">
+      <Filter>parse</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Nurons.cu">
+      <Filter>Nurons</Filter>
+    </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="errorHandler.cpp">
+      <Filter>error</Filter>
+    </ClCompile>
+    <ClCompile Include="Nuron.cpp">
+      <Filter>nuron</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>misil</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>misil</Filter>
+    </ClCompile>
+    <ClCompile Include="UnityPlug.cpp">
+      <Filter>Unity Plugin.</Filter>
+    </ClCompile>
+    <ClCompile Include="load.cpp">
+      <Filter>Nurons\Load</Filter>
+    </ClCompile>
+    <ClCompile Include="save.cpp">
+      <Filter>Nurons\Save</Filter>
+    </ClCompile>
+    <ClCompile Include="start.cpp">
+      <Filter>Nurons\start</Filter>
+    </ClCompile>
+    <ClCompile Include="update.cpp">
+      <Filter>Nurons\Update</Filter>
+    </ClCompile>
+    <ClCompile Include="end.cpp">
+      <Filter>Nurons\end</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Nurons.h">
+      <Filter>Nurons</Filter>
+    </ClInclude>
+    <ClInclude Include="parse.h">
+      <Filter>parse</Filter>
+    </ClInclude>
+    <ClInclude Include="errorHandler.h">
+      <Filter>error</Filter>
+    </ClInclude>
+    <ClInclude Include="Nuron.h">
+      <Filter>nuron</Filter>
+    </ClInclude>
+    <ClInclude Include="framework.h">
+      <Filter>misil</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>misil</Filter>
+    </ClInclude>
+    <ClInclude Include="load.h">
+      <Filter>Nurons\Load</Filter>
+    </ClInclude>
+    <ClInclude Include="save.h">
+      <Filter>Nurons\Save</Filter>
+    </ClInclude>
+    <ClInclude Include="start.h">
+      <Filter>Nurons\start</Filter>
+    </ClInclude>
+    <ClInclude Include="update.h">
+      <Filter>Nurons\Update</Filter>
+    </ClInclude>
+    <ClInclude Include="end.h">
+      <Filter>Nurons\end</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="error">
+      <UniqueIdentifier>{27485c07-74ff-4228-966c-5b577a96eab1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="parse">
+      <UniqueIdentifier>{e1252abc-92be-4afc-a17d-064b7030fb19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Nurons">
+      <UniqueIdentifier>{cffade97-695a-4898-9ba0-0690fecb4c08}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="nuron">
+      <UniqueIdentifier>{0eb76936-3934-46d5-9bf3-f354f2c50beb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="misil">
+      <UniqueIdentifier>{b539842b-ac22-4992-afac-bf6e6298fa8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Unity Plugin.">
+      <UniqueIdentifier>{ff67e45f-73ac-4aee-bc2e-4c39e3ce0a9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Nurons\Load">
+      <UniqueIdentifier>{bf05d6a1-a55b-461d-85db-28d78a15c592}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Nurons\Save">
+      <UniqueIdentifier>{d5bcf1f2-c9cc-432f-82fd-220d0ee81511}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Nurons\Data">
+      <UniqueIdentifier>{09eb01fb-024f-4dce-93e3-7c615c6bfb71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Nurons\Update">
+      <UniqueIdentifier>{14bb610a-c191-4b7e-9aeb-6dc60e25ad60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Nurons\start">
+      <UniqueIdentifier>{a7291831-5169-4082-911c-80435152c55f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Nurons\end">
+      <UniqueIdentifier>{a3be7fc2-6034-43f6-b1f6-f22408225d01}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint">
+      <Filter>misil</Filter>
+    </None>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,514 @@
+parse neds error handler.
+
+https://docs.microsoft.com/en-us/previous-versions/visualstudio/visual-studio-2012/ms177226(v=vs.90)?redirectedfrom=MSDN
+
+
+
+go back and re do all device function calls to standardize thred count.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Supressed code||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+namespace TEST
+{
+	
+
+	//cudaError_t Randunsigned quantity, int* data, int range, int offset);
+	cudaError_t writeTest();
+
+	int savefulltest(char* nuronDecription, unsigned int infoPerNuron, STE::sts stats, STE::Nuron* nurons, STE::connection* conections, unsigned int I);
+
+}
+
+
+namespace TEST 
+{
+
+    __global__ void rad(unsigned* data, unsigned range, int offset);
+    /*
+    cudaError_t Rand(int* data, unsigned quantity,  int range, int offset) {
+        //ptr to all nurond on gpu
+        unsigned* results = 0;
+        //cuda error vareable
+        cudaError_t cudaStatus;
+
+        //dim3 RNG3(rand() % 100 + 900000, rand() % 100 + 900000, rand() % 100 + 900000);
+
+        // Choose which GPU to run on, change this on a multi-GPU system.
+        cudaStatus = cudaSetDevice(0);
+        if (cudaStatus != cudaSuccess) {
+            fprintf(stderr, "cudaSetDevice failed!  Do you have a CUDA-capable GPU installed?");
+            goto Test1Error;
+        }
+
+        // allocate space on the gpu for all the nurons and set the dev_allNur ptr to that location
+        cudaStatus = cudaMalloc((void**)&results, quantity * sizeof(int));
+        if (cudaStatus != cudaSuccess) {
+            fprintf(stderr, "cudaMalloc failed!");
+            goto Test1Error;
+        }
+
+        curandGenerator_t gen;
+        curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
+        curandSetPseudoRandomGeneratorSeed(gen, 1234ULL);
+        curandGenerate(gen, results, quantity);
+
+        // Launch a kernel on the GPU with one thread for each element.
+        rad << < dim3(quantity, 1, 1), 1 >> > (results, range, offset);
+
+        // Check for any errors launching the kernelwwww
+        cudaStatus = cudaGetLastError();
+        if (cudaStatus != cudaSuccess) {
+            fprintf(stderr, "addKernel launch failed: %s\n", cudaGetErrorString(cudaStatus));
+            goto Test1Error;
+        }
+
+        // cudaDeviceSynchronize waits for the kernel to finish, and returns
+        // any errors encountered during the launch.
+        cudaStatus = cudaDeviceSynchronize();
+        if (cudaStatus != cudaSuccess) {
+            fprintf(stderr, "cudaDeviceSynchronize returned error code %d after launching addKernel!\n", cudaStatus);
+            goto Test1Error;
+        }
+
+        // Copy nurons from gpu memory to cpu memory.
+        cudaStatus = cudaMemcpy(data, (int*)results, quantity * sizeof(int), cudaMemcpyDeviceToHost);
+        if (cudaStatus != cudaSuccess) {
+            fprintf(stderr, "cudaMemcpy failed!");
+            goto Test1Error;
+        }
+
+
+    Test1Error:
+        cudaFree(results);
+        return cudaStatus;
+    }
+    */
+    __global__ void rad(unsigned* data, unsigned range, int offset) {
+
+        unsigned int I = blockIdx.x;
+        //try curand
+        data[I] = data[I] % range + offset;
+        printf("Data: %i\n", data[I]);
+    }
+
+    __global__ void writeTestKern(char* data, unsigned size);
+
+    cudaError_t writeTest() {
+        cudaError_t cudaStatus;
+
+        dim3 a(1, 1, 1);
+
+        cudaStatus = cudaSetDevice(0);
+
+        unsigned size = 30;
+        char* host_data;
+        char* device_data;
+
+        size = size + 1;
+
+        host_data = (char*)malloc(size * sizeof(char));
+        host_data[size - 1] = NULL;
+        cudaStatus = cudaMalloc((void**)&device_data, size * sizeof(char));
+        if (cudaStatus != cudaSuccess) {
+            fprintf(stderr, "cudaMalloc failed!");
+            goto TEST_WRITE_SAVE;
+        }
+
+        writeTestKern <<<a, 1 >> > (device_data, size - 1);
+
+        cudaStatus = cudaDeviceSynchronize();
+        if (cudaStatus != cudaSuccess) {
+            fprintf(stderr, "cudaDeviceSynchronize returned error code %d after launching addKernel!\n", cudaStatus);
+            goto TEST_WRITE_SAVE;
+        }
+        cudaStatus = cudaMemcpy(host_data, device_data, size * sizeof(char), cudaMemcpyDeviceToHost);
+        if (cudaStatus != cudaSuccess) {
+            fprintf(stderr, "cudaMemcpy failed!");
+            goto TEST_WRITE_SAVE;
+        }
+
+
+
+    TEST_WRITE_SAVE:
+        std::cout << "test" << std::endl;
+        for (unsigned i = 0; i < size - 1; i++)
+        {
+            std::cout << host_data[i] << std::endl;
+        }
+        cudaFree(device_data);
+        free(host_data);
+
+        return cudaStatus;
+    }
+
+    __global__ void writeTestKern(char* data, unsigned size) {
+        char digits[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+        char* ptr = data;
+        char* str;
+        for (unsigned i = 0; i < size; i++)
+        {
+            //ptr[0] = digits[i % 10];
+            str = "b";
+            memcpy(ptr, str, 1);
+            ptr = ptr + 1;
+        }
+    }
+
+    int savefulltest(char* nuronDecription, unsigned int infoPerNuron, STE::sts stats, STE::Nuron* nurons, STE::connection* conections, unsigned int I);
+
+    //    save test initalizer
+        /*
+        void saveTestHost() {
+            STE::Nurons Test(10, 10, dim3(100,1,1), 1);
+            std::string outpuit;
+            outpuit =
+                (std::string)"Nurons\n" +
+                "total: " + std::to_string( stats.totalNum) + '\n' +
+                "shape: " + std::to_string( stats.shape) + '\n' +
+                "volume: " + std::to_string( stats.volume.x) + "," + std::to_string( stats.volume.y) + "," + std::to_string( stats.volume.z) + '\n' +
+                "maxConnections: " + std::to_string( stats.maxConnections) + '\n';
+            char* host_NuronDecription;
+            char* dev_NuronDecription;
+
+            unsigned int maxIdDigits = (unsigned int)log10( stats.totalNum) + 1;
+            unsigned int maxSensitivityDigits = ((unsigned int)log10( stats.maxSensitivity) + 1);
+            unsigned int MaxTimeDigits = ((unsigned int)log10( stats.maxNuronTime) + 1);
+            unsigned int connectiosPerNuron = ((unsigned int)log10( stats.maxConnections) + 1);
+            unsigned int maxRangeDigits = ((unsigned int)log10( stats.maxRange) + 1);
+
+            unsigned int infoPerNuron =
+                8 + maxIdDigits +//id
+                11 + (maxIdDigits * 3) + 2 +//pos
+                8 + maxRangeDigits +//range
+                14 + maxSensitivityDigits +//sensitivity
+                13 + 1 +//activation
+                11 + 1 +//isSensor
+                17 + ( stats.maxConnections - 1) + ( stats.maxConnections) + // connections is connected ()bool
+                17 + ( stats.maxConnections - 1) + ( stats.maxConnections * MaxTimeDigits) + //time of each connection
+                15 + ( stats.maxConnections - 1) + ( stats.maxConnections * maxIdDigits);//id of each connection
+
+            /*std::cout << " 8 + maxIdDigits = " << 8 + maxIdDigits << std::endl;
+            std::cout << " 11 + (maxIdDigits * 3) + 2 = " << 11 + (maxIdDigits * 3) + 2 << std::endl;
+            std::cout << "  8 + maxRangeDigits = " << 8 + maxRangeDigits << std::endl;
+            std::cout << " 14 + maxSensitivityDigits = " << 14 + maxSensitivityDigits << std::endl;
+            std::cout << " 13 + 1 = " << 13 + 1 << std::endl;
+            std::cout << " 11 + 1 = " << 11 + 1 << std::endl;
+            std::cout << " 17 + (connectiosPerNuron - 1) + (connectiosPerNuron) = " << 17 + (connectiosPerNuron - 1) + (connectiosPerNuron) << std::endl;
+            std::cout << " 17 + (connectiosPerNuron - 1) + (connectiosPerNuron * MaxTimeDigits) = " << 17 + (connectiosPerNuron - 1) + (connectiosPerNuron * MaxTimeDigits) << std::endl;
+            std::cout << " 15 + (connectiosPerNuron - 1) + (connectiosPerNuron * maxIdDigits) = " << 17 + (connectiosPerNuron - 1) + (connectiosPerNuron * maxIdDigits) << std::endl;
+
+
+            unsigned int host_NuronDecriptionSize = (( stats.totalNum * infoPerNuron) + 1);
+            host_NuronDecription = (char*)malloc(host_NuronDecriptionSize * sizeof(char));
+
+
+            //save steps
+            for (unsigned i = 0; i <  stats.totalNum + 5; i++)
+            {
+
+                TEST::savefulltest(host_NuronDecription, infoPerNuron,  stats,  allNurons,  allConections, i);
+            }
+
+            host_NuronDecription[ stats.totalNum * infoPerNuron] = NULL;
+            std::cout << "cpu result \n" << host_NuronDecription << std::endl;
+            free(host_NuronDecription);
+
+        }
+        */
+
+    int savefulltest(char* nuronDecription, unsigned int infoPerNuron, STE::sts stats, STE::Nuron* nurons, STE::connection* conections, unsigned int I)
+    {
+        //loop through  maxDigitsId number of time (EX:4)
+        if (I >= stats.totalNum) {
+            // printf("extra id %i", I);
+            return 0;
+        }
+        //THRED INDEX = block id.X !!!!!!!!!!! cahnge this make each block a wrap size of threds
+        //unsigned int I = (blockIdx.x * blockDim.x) + threadIdx.x;
+        //printf("nuron: %d\n", I);
+
+        //unsigned int position = I * infoPerNuron;
+        /*
+            Nuron: # -----------------------8 + maxIdDigits
+            position: #, #, # --------------11 + (maxIdDigits*3)+2
+            Range: # -----------------------8 + maxRangeDigits
+            sensitivity: # -----------------14 + maxSensitivityDigits
+            activation: # ------------------13 + 1
+            sensor: b ----------------------9+1
+            currnetConnectionBool: ********-24 + ((connectiosPerNuron*2)-1)
+            currentConnectionTime: ********-24 + (connectiosPerNuron-1)+(connectiosPerNuron*maxYimeDigits)
+            currnetConnectionID: ********---22 + (connectiosPerNuron-1)+(connectiosPerNuron*maxIdDigits)
+
+
+            Nuron : # + 1
+            *
+            *
+            *
+            *
+        */
+        // decide the number of digits to use when writing position and id
+        unsigned int maxDigitsId = (unsigned int)(log10((double)stats.totalNum) + 1);
+        //number of digits 
+        unsigned int digitsID;
+        //a simple int to char converter
+        char digits[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+        //current ptr to where we want to write text
+        char* ptrStart;
+        //vvvvvv trouble shooting
+        ptrStart = nuronDecription + (I * infoPerNuron);
+
+        //^^^^^^^^^^
+        //temporary vareable to hold text
+        char* tempVar = "\nNuron: ";
+
+        //print id
+        // a temporary vareable to be used in the loop if the max number of digits in the id is 4 (EX: 8593) we set maxdigitsIdTemp to 1000
+        unsigned int maxdigitsIdTemp;
+
+        //vvvvvvvvvvuncomment in the kenal
+       // ptrStart = nuronDecription + (I * infoPerNuron);
+        //^^^^^^^^^^
+
+
+        digitsID = (unsigned int)log10((double)I) + 1;
+
+        //coppy tempvar to the current pointed at adress 8 chariters long (8 chariters because {\n,N,u,r,o,n,:, }is 8 chariters)  -- tecnicaly there is a null pter at the end of tempvar but we dont want that coppied
+        memcpy(ptrStart, tempVar, 8);
+        //move the ptr addres 8 char units to pass the writtentext  
+        ptrStart = ptrStart + 8;
+
+
+        //set to max id digits
+        maxdigitsIdTemp = (unsigned int)pow((double)10, (double)(maxDigitsId - 1));
+
+
+
+        for (unsigned i = 0; i < maxDigitsId; i++)
+        {
+            /* at this point we wright each digit as a chariter.
+            * ath the begining of the fires loop we have the following (with new line charters being shown before the newline itselv being displayeed happening)
+            * "\n
+            * Nuron: "
+            * we also have maxdigitsIdTemp = 10^maxDigitsId (EX:10000)
+            * and I is arbitrary (EX: 1500)
+            */
+
+            //after this line the next unused chariter in the memory loation pointed to by PtrStart is set to I/maxdigitsIdTemp (in our example this works out to 1500/1000 = 1 ...integers round down...)
+            //we take the modulo to clamp numbers from 0 to 9 so we dont acess out side of the digits char array.
+            //digits is used to change a single digit base 10 number to a single char 
+
+            ptrStart[i] = digits[(I / maxdigitsIdTemp) % 10];
+            //std::cout << "I: " << I << "\nmaxdigitsIdTemp: " << maxdigitsIdTemp << std::endl;  <--for testing
+            //std::cout << ptrStart[i] << std::endl;                                             <--for testing
+            //after this line we remove a zeo from maxdigitsIdTemp. using this metod we cycle through the whole id chariter by cahriter
+            maxdigitsIdTemp = maxdigitsIdTemp / 10;
+
+            // this is repeeted
+            // in this method we get leading zeros witch i am fine with this means with an I of 50 and a max digits of 4  we get 0050
+        }
+
+
+
+        //we now move the ptrstart location maxdigitsID number of units witch leaves  ptrStart[]
+        ptrStart = ptrStart + maxDigitsId;
+
+        //print position x,y,z
+        //the same method is repeted for x,y,and z values as the id number
+        tempVar = "\nposition: ";
+        memcpy(ptrStart, tempVar, 11);
+        ptrStart = ptrStart + 11;
+
+        //SAVE Xpos
+        //std::cout << "Xpos: ";
+
+        maxdigitsIdTemp = (unsigned int)pow((double)10, (double)(maxDigitsId - 1));
+        for (unsigned i = 0; i < maxDigitsId; i++)//print id
+        {
+            ptrStart[i] = digits[(nurons[I].position.x / maxdigitsIdTemp) % 10];
+            maxdigitsIdTemp = maxdigitsIdTemp / 10;
+            //std::cout << ptrStart[i] << std::endl;                                            
+
+        }
+        ptrStart[maxDigitsId] = ',';
+        ptrStart = ptrStart + maxDigitsId + 1;
+
+        std::cout << "lllllllllleeeeeeeet: " << maxdigitsIdTemp << std::endl;
+
+        //SAVE ypos
+        maxdigitsIdTemp = (unsigned int)pow((double)10, (double)(maxDigitsId - 1));
+        for (unsigned i = 0; i < maxDigitsId; i++)//print id
+        {
+            ptrStart[i] = digits[(nurons[I].position.y / maxdigitsIdTemp) % 10];
+            maxdigitsIdTemp = maxdigitsIdTemp / 10;
+        }
+        ptrStart[maxDigitsId] = ',';
+        ptrStart = ptrStart + maxDigitsId + 1;
+
+        //SAVE Zpos
+        maxdigitsIdTemp = (unsigned int)pow((double)10, (double)(maxDigitsId - 1));
+        std::cout << "lllllllllleeeeeeeet: " << maxdigitsIdTemp << std::endl;
+        for (unsigned i = 0; i < maxDigitsId; i++)//print id
+        {
+            ptrStart[i] = digits[(nurons[I].position.z / maxdigitsIdTemp) % 10];
+            maxdigitsIdTemp = maxdigitsIdTemp / 10;
+        }
+        ptrStart = ptrStart + maxDigitsId;
+
+        //std::cout << nuronDecription << std::endl;
+
+        //print range
+        //agan we use the same method but maxDigitsIdid is recalulated with the maximum range use to calulate the number of digits
+        tempVar = "\nRange: ";
+        memcpy(ptrStart, tempVar, 8);
+        ptrStart = ptrStart + 8;
+        maxDigitsId = (unsigned int)(log10((double)stats.maxRange) + 1);
+        maxdigitsIdTemp = (unsigned int)pow((double)10, (maxDigitsId - 1));
+
+        for (unsigned i = 0; i < maxDigitsId; i++)
+        {
+            ptrStart[i] = digits[(stats.maxRange / maxdigitsIdTemp) % 10];
+            maxdigitsIdTemp = maxdigitsIdTemp / 10;
+        }
+        ptrStart = ptrStart + maxDigitsId;
+
+
+
+        //print sensitivity
+        //agan we use the same method but maxDigitsIdid is recalulated with the maximum sensitivity use to calulate the number of digits
+        tempVar = "\nsensitivity: ";
+        memcpy(ptrStart, tempVar, 14);
+        ptrStart = ptrStart + 14;
+
+        maxDigitsId = (unsigned int)(log10((double)stats.maxSensitivity) + 1);
+        maxdigitsIdTemp = (unsigned int)pow((double)10, (double)(maxDigitsId - 1));
+        for (unsigned i = 0; i < maxDigitsId; i++)
+        {
+            ptrStart[i] = digits[(stats.maxSensitivity / maxdigitsIdTemp) % 10];
+            maxdigitsIdTemp = maxdigitsIdTemp / 10;
+        }
+        ptrStart = ptrStart + maxDigitsId;
+
+        //print its activation (1= active,  0 = not active)
+        //here it is simple cast the bool activation to an unsigned int the store the value 
+        tempVar = "\nactivation: ";
+        memcpy(ptrStart, tempVar, 13);
+        ptrStart = ptrStart + 13;
+        ptrStart[0] = digits[unsigned(nurons[I].activation) % 10];
+        ptrStart = ptrStart + 1;
+
+
+        //print if sensor (1= yes, 0 = no)
+        tempVar = "\nisSensor: ";
+        memcpy(ptrStart, tempVar, 11);
+        ptrStart = ptrStart + 11;
+        ptrStart[0] = digits[unsigned(nurons[I].sensor) % 10];
+        ptrStart = ptrStart + 1;
+
+        //print if nuron is connection conected (1 = conected = true, 0 = not)
+        tempVar = "\ncurrentConBool: ";
+        memcpy(ptrStart, tempVar, 17);
+        ptrStart = ptrStart + 17;
+
+        for (unsigned i = 0; i < stats.maxConnections; i++)
+        {
+            ptrStart[i * 2] = digits[(unsigned)(conections[stats.maxConnections * I + i].connected) % 10];
+            ptrStart[(i * 2) + 1] = ',';
+        }
+
+        ptrStart = ptrStart + (2 * stats.maxConnections) - 1;
+
+
+        //print connected nuron time
+        tempVar = "\ncurrentConTime: ";
+        memcpy(ptrStart, tempVar, 17);
+        ptrStart = ptrStart + 17;
+
+
+        maxDigitsId = (unsigned int)(log10((double)stats.maxNuronTime) + 1);
+
+
+        for (unsigned i = 0; i < stats.maxConnections; i++)
+        {
+            maxdigitsIdTemp = (unsigned int)pow(10, (maxDigitsId - 1));
+            for (unsigned j = 0; j < maxDigitsId; j++)
+            {
+                //ptrStart[(i * (maxDigitsId + 1)) + j] = digits[(nurons->connections->time / maxdigitsIdTemp)%9];
+                ptrStart[j] = digits[(conections[stats.maxConnections * I + i].time / maxdigitsIdTemp) % 10];
+                maxdigitsIdTemp = maxdigitsIdTemp / 10;
+            }
+            ptrStart[maxDigitsId] = ',';
+            ptrStart = ptrStart + maxDigitsId + 1;
+        }
+
+        ptrStart = ptrStart - 1;
+
+        //print connected nuron ID
+        //return 0;
+        tempVar = "\ncurrentConId: ";
+        memcpy(ptrStart, tempVar, 15);
+        ptrStart = ptrStart + 15;
+
+        maxDigitsId = (unsigned int)(log10((double)stats.totalNum) + 1);
+
+
+        for (unsigned i = 0; i < stats.maxConnections; i++)
+        {
+            maxdigitsIdTemp = (unsigned int)pow((double)10, (double)(maxDigitsId - 1));
+            for (unsigned j = 0; j < maxDigitsId; j++)
+            {
+
+                ptrStart[j] = digits[(conections[stats.maxConnections * I + i].id / maxdigitsIdTemp) % 10];
+                maxdigitsIdTemp = maxdigitsIdTemp / 10;
+            }
+            if (i + 1 != stats.maxConnections)
+            {
+                ptrStart[maxDigitsId] = ',';
+                ptrStart = ptrStart + 1;
+
+            }
+            ptrStart = ptrStart + maxDigitsId;
+        }
+        return 0;
+    }
+    // int to unsigned issue
+}
+#endif
+
+/*
+NOTES
+add an intrupt system or some way of having nurons react to an activiation opposed to checking for one
+*/
